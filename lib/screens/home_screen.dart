@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_gemini/models/urun.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
@@ -73,7 +74,14 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _sendMessage(String message) {
-    _chatSession.sendMessage(Content.text(message)).then(
+    final Content content = Content.text(message);
+    _generativeModel.countTokens([content]).then(
+      (CountTokensResponse value) {
+        log("${value.totalTokens} token harcandı");
+      },
+    );
+
+    _chatSession.sendMessage(content).then(
       (GenerateContentResponse value) {
         if (value.text case final String text) {
           final List urunler = jsonDecode(text);
